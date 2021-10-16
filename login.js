@@ -1,21 +1,19 @@
-import {sleep, check} from 'k6';
+import {check, sleep} from 'k6';
 import {SharedArray} from "k6/data";
 import exec from "k6/execution";
 import http from "k6/http";
 
-const data = new SharedArray("users", function () {
-    return JSON.parse(open('users.json'));
+const data = new SharedArray("singed-up-users", function () {
+    return JSON.parse(open('signed-up-users.json'));
 })
 
 
-const virtualUsers = 250;
-
 export let options = {
-	scenarios: {
+    scenarios: {
         "first-wave": {
             executor: "shared-iterations",
-            vus: virtualUsers,
-            iterations: data.slice(0, virtualUsers).length,
+            vus: data.length,
+            iterations: data.length,
             maxDuration: "1h"
         }
     }
@@ -23,12 +21,10 @@ export let options = {
 
 export default function () {
     var user = data[exec.scenario.iterationInTest];
-    var url = 'http://localhost:3000/api/v1/user/sign-up/'
+    var url = 'http://localhost:3000/api/v1/user/login/'
     var payload = JSON.stringify({
         username: user.username,
         password: user.password,
-        first_name: user.first_name,
-        last_name: user.last_name,
     });
 
     var params = {
@@ -38,9 +34,9 @@ export default function () {
     };
 
     const resp = http.post(url, payload, params);
-    sleep(2);
+    sleep(3);
 
     const checkRes = check(resp, {
-        'status is 201': (r) => r.status === 201
+        'status is 200': (r) => r.status === 200
     });
 }

@@ -1,4 +1,4 @@
-import {sleep} from 'k6';
+import {sleep, check} from 'k6';
 import {SharedArray} from "k6/data";
 import exec from "k6/execution";
 import http from "k6/http";
@@ -37,6 +37,10 @@ export default function () {
         },
     };
 
-    http.post(url, payload, params);
+    const resp = http.post(url, payload, params);
     sleep(2);
+
+    const checkRes = check(resp, {
+        'status is 200': (r) => r.status === 201
+    });
 }

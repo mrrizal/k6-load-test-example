@@ -38,7 +38,7 @@ export default function () {
     };
 
     const resp = http.post(url, payload, params);
-    sleep(2);
+    sleep(3);
 
     const checkRes = check(resp, {
         'status is 201': (r) => r.status === 201

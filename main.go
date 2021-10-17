@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/joho/godotenv"
 	"github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
@@ -80,12 +81,14 @@ func InitDatabase() {
 
 type configs struct {
 	DatabaseURL string
+	SecretKey   string
 }
 
 var Configs configs
 
 func GetSettings() {
 	Configs.DatabaseURL = os.Getenv("DATABASE_URL")
+	Configs.SecretKey = os.Getenv("SECRET_KEY")
 }
 
 func getSingedUpUsers() {
@@ -106,12 +109,41 @@ func getSingedUpUsers() {
 	_ = ioutil.WriteFile("signed-up-users.json", usersJSON, 0644)
 }
 
+func generateJWTToken(user User) (string, error) {
+	token := jwt.New(jwt.SigningMethodHS256)
+	claims := token.Claims.(jwt.MapClaims)
+	claims["id"] = user.ID
+	claims["username"] = user.Username
+	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+	t, err := token.SignedString([]byte(Configs.SecretKey))
+	if err != nil {
+		return "", err
+	}
+	return t, nil
+}
+
+func getJWTUserToken() {
+	var users []User
+	var tokens []string
+	DBConn.Model(&User{}).Scan(&users)
+	for _, user := range users {
+		token, _ := generateJWTToken(user)
+		tokens = append(tokens, token)
+	}
+	tokensJSON, err := json.MarshalIndent(&tokens, "", "  ")
+	if err != nil {
+		panic(err.Error())
+	}
+	_ = ioutil.WriteFile("tokens.json", tokensJSON, 0644)
+}
+
 func main() {
 	loadEnvFile()
 	GetSettings()
 	InitDatabase()
 	genUser := flag.Bool("generate-user", false, "a bool")
 	singedUpUser := flag.Bool("signed-up-user", false, "a bool")
+	genJWTToken := flag.Bool("gen-jwt-token", false, "a bool")
 	flag.Parse()
 
 	if *genUser {
@@ -120,5 +152,9 @@ func main() {
 
 	if *singedUpUser {
 		getSingedUpUsers()
+	}
+
+	if *genJWTToken {
+		getJWTUserToken()
 	}
 }

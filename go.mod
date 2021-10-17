@@ -3,6 +3,7 @@ module github.com/mrrizal/k6-load-test-example
 go 1.17
 
 require (
+	github.com/golang-jwt/jwt/v4 v4.1.0
 	github.com/joho/godotenv v1.4.0
 	github.com/lib/pq v1.10.3
 	github.com/sirupsen/logrus v1.8.1

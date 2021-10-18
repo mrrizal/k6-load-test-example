@@ -23,7 +23,7 @@ export let options = {
 
 export default function () {
     var user = data[exec.scenario.iterationInTest];
-    var url = 'http://localhost:3000/api/v1/user/sign-up/'
+    var url = 'http://localhost:30003/api/v1/user/sign-up/'
     var payload = JSON.stringify({
         username: user.username,
         password: user.password,
@@ -38,7 +38,7 @@ export default function () {
     };
 
     const resp = http.post(url, payload, params);
-    sleep(2);
+    sleep(3);
 
     const checkRes = check(resp, {
         'status is 201': (r) => r.status === 201

@@ -21,7 +21,7 @@ export let options = {
 
 export default function () {
     var token = data[exec.scenario.iterationInTest];
-    var url = "http://localhost:3000/api/v1/book/"
+    var url = `${__ENV.HOSTNAME}/api/v1/book/`
 
     for (let i = 0; i < 50; i++) {
         let title = "book" + i

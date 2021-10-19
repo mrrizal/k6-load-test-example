@@ -23,7 +23,8 @@ export let options = {
 
 export default function () {
     var user = data[exec.scenario.iterationInTest];
-    var url = 'http://localhost:30003/api/v1/user/sign-up/'
+    var url = `${__ENV.HOSTNAME}/api/v1/user/sign-up/`
+
     var payload = JSON.stringify({
         username: user.username,
         password: user.password,

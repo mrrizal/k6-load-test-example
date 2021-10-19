@@ -4,16 +4,17 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"regexp"
+	"time"
+
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/joho/godotenv"
 	"github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"io/ioutil"
-	"os"
-	"regexp"
-	"time"
 )
 
 type UserPayload struct {
@@ -142,19 +143,15 @@ func main() {
 	GetSettings()
 	InitDatabase()
 	genUser := flag.Bool("generate-user", false, "a bool")
-	singedUpUser := flag.Bool("signed-up-user", false, "a bool")
-	genJWTToken := flag.Bool("gen-jwt-token", false, "a bool")
+	genJWTToken := flag.Bool("generate-jwt-token", false, "a bool")
 	flag.Parse()
 
 	if *genUser {
 		generateUser()
 	}
 
-	if *singedUpUser {
-		getSingedUpUsers()
-	}
-
 	if *genJWTToken {
+		getSingedUpUsers()
 		getJWTUserToken()
 	}
 }

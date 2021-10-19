@@ -14,7 +14,7 @@ export let options = {
 };
 
 
-const BASE_URL = 'http://localhost:3000/api/v1/book/'
+const BASE_URL = `${__ENV.HOSTNAME}/api/v1/book/`
 
 export default function () {
     let url = BASE_URL
